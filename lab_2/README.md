@@ -2,7 +2,7 @@
 
 ## НКА Томпсона
 
-<img src="MinNFA.png" width="1001"  alt="MinNFA png here"/>
+<img src="MinNFA.png" width="1001"  alt="NFA png here"/>
 
 ## ДКА
 
@@ -32,7 +32,7 @@
 
 ## НКА
 
-<img src="NFA.png" width="1001"  alt="NFA png here"/>
+<img src="NFA.png" width="1001"  alt="MinNFA png here"/>
 
 Таблица множеств классов эквивалентности НКА:
 
