@@ -8,11 +8,20 @@ using namespace std;
 const string alphabet = "ab";
 const regex regular("b*((ab*a)*(aabb|(babb)*))*");
 
-string generateRandomString(int n) {
+int generateRandomLength() {
+    static random_device rd;
+    static mt19937 gen(rd());
+    static uniform_int_distribution<int> dist(0, 20);
+    return dist(gen);
+}
+
+string generateRandomString() {
     string s;
     static random_device rd;
     static mt19937 gen(rd());
     static uniform_int_distribution<size_t> dist(0, alphabet.size() - 1);
+    
+    int n = generateRandomLength();
     for (int i = 0; i < n; ++i) {
         s += alphabet[dist(gen)];
     }
@@ -124,7 +133,7 @@ bool fuzz(string s) {
 int main() {
     string s;
     for (int i = 0; i < 10000; ++i) {
-        s = generateRandomString(20);
+        s = generateRandomString();
         if (!fuzz(s)) {
             cout << "bad" << endl;
             cout << s << "\n" << regex_match(s, regular) << " " << DFA(s) << " " << NFA(s) << endl;
