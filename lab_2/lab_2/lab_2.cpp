@@ -126,8 +126,71 @@ bool NFA(const string &s) {
     return current.count(0) || current.count(2);
 }
 
+bool AFA(const string& s) {
+
+    // верхняя ветка это НКА
+    vector<vector<vector<int>>> nfa_transitions(6, vector<vector<int>>(2));
+    nfa_transitions[0][0] = {1, 3};
+    nfa_transitions[0][1] = {0, 3};
+    nfa_transitions[1][0] = {2};
+    nfa_transitions[1][1] = {1};
+    nfa_transitions[2][0] = {1, 3};
+    nfa_transitions[2][1] = {3};
+    nfa_transitions[3][0] = {4};
+    nfa_transitions[4][1] = {5};
+    nfa_transitions[5][1] = {2};
+    
+    vector<vector<vector<int>>> lower_transitions(7, vector<vector<int>>(2));
+    lower_transitions[0][0] = {1};
+    lower_transitions[0][1] = {0};
+    lower_transitions[1][0] = {1};
+    lower_transitions[1][1] = {2};
+    lower_transitions[2][0] = {3};
+    lower_transitions[2][1] = {0};
+    lower_transitions[3][0] = {1};
+    lower_transitions[3][1] = {4};
+    lower_transitions[4][0] = {5};
+    lower_transitions[4][1] = {0};
+    lower_transitions[5][1] = {6};
+    lower_transitions[6][1] = {0};
+    
+    set<int> current_nfa = {0};
+    set<int> current_lower = {0};
+    
+    for (char c : s) {
+        int idx = (c == 'a') ? 0 : 1;
+        
+        set<int> next_nfa;
+        for (int state : current_nfa) {
+            for (int next_state : nfa_transitions[state][idx]) {
+                next_nfa.insert(next_state);
+            }
+        }
+        
+        set<int> next_lower;
+        for (int state : current_lower) {
+            for (int next_state : lower_transitions[state][idx]) {
+                next_lower.insert(next_state);
+            }
+        }
+        
+        if (next_nfa.empty() || next_lower.empty()) {
+            return false;
+        }
+        
+        current_nfa = next_nfa;
+        current_lower = next_lower;
+    }
+    
+    bool nfa_accepts = (current_nfa.count(0) || current_nfa.count(2));
+    bool lower_accepts = (current_lower.count(0) || current_lower.count(1) || 
+                         current_lower.count(2) || current_lower.count(3));
+    
+    return nfa_accepts && lower_accepts;
+}
+
 bool fuzz(string s) {
-    return (regex_match(s, regular) == DFA(s) && DFA(s) == NFA(s));
+    return (regex_match(s, regular) == DFA(s) && DFA(s) == NFA(s) && NFA(s) == AFA(s));
 }
 
 int main() {
@@ -136,7 +199,7 @@ int main() {
         s = generateRandomString();
         if (!fuzz(s)) {
             cout << "bad" << endl;
-            cout << s << "\n" << regex_match(s, regular) << " " << DFA(s) << " " << NFA(s) << endl;
+            cout << s << "\n" << regex_match(s, regular) << " " << DFA(s) << " " << NFA(s) << " " << AFA(s) << endl;
             return 0;
         }
     }
