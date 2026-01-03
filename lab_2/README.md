@@ -68,17 +68,3 @@
 3) Операции предпросмотра, ретроспективной проверки и их отрицательные версии тоже не имеют смысла, потому что ничего не упростят, а только усложнят регулярку
 4) Маркеры начала и конца выражения `^b*((ab*a)|.abb)*$`
 
-
-ZZZZZZZZZZZZZZZZZZZZZ      ZZZZZZZZZZZZZZZZZZZZZ 
-ZZZZZZZZZZZZZZZZZZZZZ      ZZZZZZZZZZZZZZZZZZZZZ
-                ZZZZZ                      ZZZZZ
-              ZZZZZ                      ZZZZZ
-            ZZZZZ                      ZZZZZ
-          ZZZZZ                      ZZZZZ
-        ZZZZZ                      ZZZZZ
-      ZZZZZ                      ZZZZZ
-    ZZZZZ                      ZZZZZ
-  ZZZZZ                      ZZZZZ
-ZZZZZ                      ZZZZZ
-ZZZZZZZZZZZZZZZZZZZZZ      ZZZZZZZZZZZZZZZZZZZZZ
-ZZZZZZZZZZZZZZZZZZZZZ      ZZZZZZZZZZZZZZZZZZZZZ
