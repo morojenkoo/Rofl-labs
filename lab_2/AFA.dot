@@ -1,0 +1,41 @@
+digraph NFA {
+    rankdir=LR;
+    start [shape=none,label=""];
+    start -> "&";
+
+    node [shape=circle];
+
+    q_0_0 [shape=doublecircle];
+    q_0_2 [shape=doublecircle];
+    q_1_0 [shape=doublecircle];
+    q_1_1 [shape=doublecircle];
+    q_1_2 [shape=doublecircle];
+    q_1_3 [shape=doublecircle];
+    "&" [shape=circle];
+
+    "&" -> q_1_0 [label="ε"];
+    q_1_0 -> q_1_1 [label="a"];
+    q_1_0 -> q_1_0 [label="b"];
+    q_1_1 -> q_1_2 [label="b"];
+    q_1_1 -> q_1_1 [label="a"];
+    q_1_2 -> q_1_3 [label="a"];
+    q_1_2 -> q_1_0 [label="b"];
+    q_1_3 -> q_1_4 [label="b"];
+    q_1_3 -> q_1_1 [label="a"];
+    q_1_4 -> q_1_5 [label="a"];
+    q_1_4 -> q_1_0 [label="b"];
+    q_1_5 -> q_1_6 [label="b"];
+    q_1_6 -> q_1_0 [label="b"];
+
+    "&" -> q_0_0 [label="ε"];
+    q_0_0 -> q_0_1 [label="a"];
+    q_0_0 -> q_0_3 [label="a,b"];
+    q_0_0 -> q_0_0 [label="b"];
+    q_0_1 -> q_0_2 [label="a"];
+    q_0_1 -> q_0_1 [label="b"];
+    q_0_2 -> q_0_1 [label="a"];
+    q_0_2 -> q_0_3 [label="a,b"];
+    q_0_3 -> q_0_4 [label="a"];
+    q_0_4 -> q_0_5 [label="b"];
+    q_0_5 -> q_0_2 [label="b"];
+}
