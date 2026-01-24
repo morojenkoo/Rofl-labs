@@ -37,9 +37,7 @@ vector<int> naive_S(int pos, const string& s, vector<int>& result)
         attr1 = t1.second;
         // S -> T  `aa`  SbbT
         if (pos1 + 1 >= s.size() || s[pos1] != 'a' || s[pos1 + 1] != 'a')
-        {
             continue;
-        }
         
         int pos2 = pos1 + 2;
 
@@ -50,9 +48,7 @@ vector<int> naive_S(int pos, const string& s, vector<int>& result)
         // S -> TaaS  `bb`  T
         for (int pos3 : s_results) {
             if (pos3 + 1 >= s.size() || s[pos3] != 'b' || s[pos3 + 1] != 'b')
-            {
                 continue;
-            }
             
             int pos4 = pos3 + 2;
             
@@ -64,9 +60,7 @@ vector<int> naive_S(int pos, const string& s, vector<int>& result)
                 int pos5 = t2.first;
                 attr2 = t2.second;
                 if (attr1 < attr2)
-                {
                     result.push_back(pos5);
-                }
             }
         }
     }
@@ -104,24 +98,18 @@ vector<pair<int, int>> naive_T(int pos, const string& s, vector<pair<int, int>>&
 
         //Получили все возможные варианты конца разбора S. Зануляем атрибут у этих позиций.
         for (int end_pos : s_results)
-        {
             attributes.push_back({end_pos, 0});
-        }
     }
     if (pos < n && s[pos] == 'a')
     {
         //T -> aT, возвращает все возможные варианты, где заканчивается этот блок
         vector<pair<int, int>> t_results = naive_T(pos + 1, s, attributes);
         for (const auto& t : t_results)
-        {
             attributes.push_back({t.first, t.second+1});
-        }
     }
     if (pos < n && s[pos] == 'a')
-    {
         //T -> a занулили атрибут
         attributes.push_back({pos+1, 0});
-    }
     return attributes;
 }
 
@@ -146,53 +134,55 @@ vector<pair<int, int>> optimized_T(int pos, const string& s);
 vector<int> optimized_S(int pos, const string& s);
 
 // Оптимизированный парсер 
-vector<int> optimized_S(int pos, const string& s) {
+vector<int> optimized_S(int pos, const string& s) 
+{
     auto key = make_pair(pos, s);
-    if (memo_S.count(key)) {
+    if (memo_S.count(key))
         return memo_S[key];
-    }
 
     vector<int> result;
     int attr1 = 0, attr2 = 0;
     vector<pair<int, int>> t1_results;
     t1_results = optimized_T(pos, s);
 
-    for (const auto& t1 : t1_results) {
+    for (const auto& t1 : t1_results) 
+    {
         int pos1 = t1.first;
         attr1 = t1.second;
-        if (pos1 + 1 >= s.size() || s[pos1] != 'a' || s[pos1 + 1] != 'a') {
+        if (pos1 + 1 >= s.size() || s[pos1] != 'a' || s[pos1 + 1] != 'a') 
             continue;
-        }
 
         int pos2 = pos1 + 2;
         vector<int> s_results;
         s_results = optimized_S(pos2, s);
 
-        for (int pos3 : s_results) {
-            if (pos3 + 1 >= s.size() || s[pos3] != 'b' || s[pos3 + 1] != 'b') {
+        for (int pos3 : s_results) 
+        {
+            if (pos3 + 1 >= s.size() || s[pos3] != 'b' || s[pos3 + 1] != 'b')
                 continue;
-            }
-
+            
             int pos4 = pos3 + 2;
             vector<pair<int, int>> t2_results;
             t2_results = optimized_T(pos4, s);
-            for (const auto& t2 : t2_results) {
+            for (const auto& t2 : t2_results) 
+            {
                 int pos5 = t2.first;
                 attr2 = t2.second;
-                if (attr1 < attr2) {
+                if (attr1 < attr2)
                     result.push_back(pos5);
-                }
             }
         }
     }
 
     attr1 = 0; attr2 = 0;
-    if (pos + 2 < s.size() && s[pos] == 'a' && s[pos + 1] == 'b' && s[pos + 2] == 'a') {
+    if (pos + 2 < s.size() && s[pos] == 'a' && s[pos + 1] == 'b' && s[pos + 2] == 'a') 
+    {
         if (pos + 3 >= s.size() && attr1 >= attr2) { return result; }
         result.push_back(pos + 3);
     }
 
-    if (pos + 2 < s.size() && s[pos] == 'a' && s[pos + 1] == 'a' && s[pos + 2] == 'a') {
+    if (pos + 2 < s.size() && s[pos] == 'a' && s[pos + 1] == 'a' && s[pos + 2] == 'a') 
+    {
         if (pos + 3 >= s.size() && attr1 >= attr2) { return result; }
         result.push_back(pos + 3);
     }
@@ -201,11 +191,11 @@ vector<int> optimized_S(int pos, const string& s) {
     return result;
 }
 
-vector<pair<int, int>> optimized_T(int pos, const string& s) {
+vector<pair<int, int>> optimized_T(int pos, const string& s) 
+{
     auto key = make_pair(pos, s);
-    if (memo_T.count(key)) {
+    if (memo_T.count(key)) 
         return memo_T[key];
-    }
 
     vector<pair<int, int>> attributes;
     int n = s.size();
@@ -215,21 +205,18 @@ vector<pair<int, int>> optimized_T(int pos, const string& s) {
         vector<int> s_results;
         s_results = optimized_S(pos2, s);
 
-        for (int end_pos : s_results) {
+        for (int end_pos : s_results)
             attributes.push_back({end_pos, 0});
-        }
     }
 
     if (pos < n && s[pos] == 'a') {
         vector<pair<int, int>> t_results = optimized_T(pos + 1, s);
-        for (const auto& t : t_results) {
+        for (const auto& t : t_results)
             attributes.push_back({t.first, t.second+1});
-        }
     }
 
-    if (pos < n && s[pos] == 'a') {
+    if (pos < n && s[pos] == 'a')
         attributes.push_back({pos+1, 0});
-    }
 
     memo_T[key] = attributes;
     return attributes;
@@ -254,7 +241,7 @@ string generate_S(int depth = 0)
     // Если это первая итерация (глубина 0), то не используем правила aaa/aba
     if (depth == 0)
     {
-        // Только S -> T a a S b b T
+        // Только S -> TaaSbbT
         int t1_attr = 0;
         int t2_attr = t1_attr + 1 + (gen() % 4);
 
@@ -272,10 +259,10 @@ string generate_S(int depth = 0)
 
         switch (rule)
         {
-            case 0: return "aba"; // S -> a b a
-            case 1: return "aaa"; // S -> a a a
+            case 0: return "aba"; // S -> aba
+            case 1: return "aaa"; // S -> aaa
             case 2:
-            { // S -> T a a S b b T
+            { // S -> TaaSbbT
                 int t1_attr = 0;
                 int t2_attr = t1_attr + 1 + (gen() % 4);
 
@@ -299,26 +286,18 @@ string generate_T1(int attr_value, int depth)
         uniform_int_distribution<> dis(0, 1);
         int choice = dis(gen);
         if (choice == 0)
-        {
-            return "ab" + generate_S(depth + 1); // T -> a b S
-        }
+            return "ab" + generate_S(depth + 1); // T -> abS
         else
-        {
             return "a"; // T -> a
-        }
     }
     else
-    {
         return "a" + generate_T1(attr_value - 1, depth);
-    }
 }
 string generate_T2(int attr_value, int depth)
 {
     static mt19937 gen(random_device{}());
     if (attr_value == 0)
-    {
         return "a";
-    }
     return "a" + generate_T2(attr_value - 1, depth);
 }
 
@@ -337,9 +316,8 @@ string generate_random_string()
     int length = dist(gen);
     string result;
     uniform_int_distribution<> dis(0, 1);
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++)
         result += dis(gen) == 0 ? 'a' : 'b';
-    }
     return result;
 }
 
@@ -358,7 +336,6 @@ bool fuzz(string& s, bool in_language)
     vector<int> result;
     int len = s.size();
 
-    //Время в миллисекундах
     auto start_naive = high_resolution_clock::now();
     bool naive_res = check(naive_S(0, s, result), len);
     auto end_naive = high_resolution_clock::now();
@@ -397,13 +374,15 @@ bool fuzz(string& s, bool in_language)
 
 int main()
 {
-    
+    //Не много тестов, чтобы не ждать долго результата
     string yes, no;
     bool y = true, n = true;
     for (int i = 0; i < 50; i++)
     {
         yes = generate_random_string_from_language();
         bool in_language = 1;
+
+        //На словах длины больше 100 наивный парсер крепенько так обдумывает
         if (yes.size() > 100)
             continue;
         if (!fuzz(yes, in_language))
@@ -412,7 +391,8 @@ int main()
             break;
         }
     }
-    
+
+    //Здесь можно сделать намного больше тестов и работать будет быстро, но опять так красивее :)
     for (int i = 0; i < 50; i++)
     {
         no = generate_random_string();
@@ -425,35 +405,23 @@ int main()
     }
     
     if (y)
-    {
         cout << "in language good" << endl;
-    }
     else
-    {
         cout << "in language bad" << endl;
-    }
     if (n)
-    {
         cout << "not in language good" << endl;
-    }
     else
-    {
         cout << "not in language bad" << endl;
-    }
     
-    // Выводим данные о времени
-    for (const auto& p : naive_in_language_times) {
+    // Выводим данные о времени, нужно для построения графиков
+    for (const auto& p : naive_in_language_times) 
         cout << "naive_in " << p.first << " " << p.second << endl;
-    }
-    for (const auto& p : optimized_in_language_times) {
+    for (const auto& p : optimized_in_language_times) 
         cout << "opt_in " << p.first << " " << p.second << endl;
-    }
-    for (const auto& p : naive_random_times) {
+    for (const auto& p : naive_random_times) 
         cout << "naive_rand " << p.first << " " << p.second << endl;
-    }
-    for (const auto& p : optimized_random_times) {
+    for (const auto& p : optimized_random_times) 
         cout << "opt_rand " << p.first << " " << p.second << endl;
-    }
     
     return 0;
 }
