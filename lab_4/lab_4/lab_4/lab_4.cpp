@@ -64,19 +64,15 @@ vector<int> naive_S(int pos, const string& s, vector<int>& result)
             }
         }
     }
-    attr1 = 0; attr2 = 0;
     //S -> aba
     if (pos + 2 < s.size() && s[pos] == 'a' && s[pos + 1] == 'b' && s[pos + 2] == 'a')
     {
-        if (pos + 3 >= s.size() && attr1 >= attr2) { return result; }
-            result.push_back(pos + 3);
+        result.push_back(pos + 3);
     }
-    attr1 = 0; attr2 = 0;
     //S-> aaa
     if (pos + 2 < s.size() && s[pos] == 'a' && s[pos + 1] == 'a' && s[pos + 2] == 'a')
     {
-        if (pos + 3 >= s.size() && attr1 >= attr2) { return result; }
-            result.push_back(pos + 3);
+        result.push_back(pos + 3);
     }
 
     return result;
@@ -173,20 +169,15 @@ vector<int> optimized_S(int pos, const string& s)
             }
         }
     }
-
-    attr1 = 0; attr2 = 0;
     if (pos + 2 < s.size() && s[pos] == 'a' && s[pos + 1] == 'b' && s[pos + 2] == 'a') 
     {
-        if (pos + 3 >= s.size() && attr1 >= attr2) { return result; }
         result.push_back(pos + 3);
     }
 
     if (pos + 2 < s.size() && s[pos] == 'a' && s[pos + 1] == 'a' && s[pos + 2] == 'a') 
     {
-        if (pos + 3 >= s.size() && attr1 >= attr2) { return result; }
         result.push_back(pos + 3);
     }
-    attr1 = 0; attr2 = 0;
     memo_S[key] = result;
     return result;
 }
@@ -230,54 +221,35 @@ bool check(const vector<int>& v, int len)
     return false;
 }
 
-string generate_T1(int attr_value, int depth);
-string generate_T2(int attr_value, int depth);
+string generate_T1(int attr_value);
+string generate_T2(int attr_value);
 
-string generate_S(int depth = 0)
+string generate_S()
 {
     static random_device rd;
     static mt19937 gen(rd());
-
-    // Если это первая итерация (глубина 0), то не используем правила aaa/aba
-    if (depth == 0)
+    uniform_int_distribution<> rule_dis(0, 2);
+    int rule = rule_dis(gen);
+    switch (rule)
     {
-        // Только S -> TaaSbbT
-        int t1_attr = 0;
-        int t2_attr = t1_attr + 1 + (gen() % 4);
+        case 0: return "aba"; // S -> aba
+        case 1: return "aaa"; // S -> aaa
+        case 2:
+        { // S -> TaaSbbT
+            int t1_attr = 0;
+            int t2_attr = t1_attr + 1 + (gen() % 4);
 
-        string t1_str = generate_T1(t1_attr, depth + 1);
-        string inner_s_str = generate_S(depth + 1);
-        string t2_str = generate_T2(t2_attr, depth + 1);
+            string t1_str = generate_T1(t1_attr);
+            string inner_s_str = generate_S();
+            string t2_str = generate_T2(t2_attr);
 
-        return t1_str + "aa" + inner_s_str + "bb" + t2_str;
-    }
-    else
-    {
-        // На других уровнях можно использовать все правила
-        uniform_int_distribution<> rule_dis(0, 2);
-        int rule = rule_dis(gen);
-
-        switch (rule)
-        {
-            case 0: return "aba"; // S -> aba
-            case 1: return "aaa"; // S -> aaa
-            case 2:
-            { // S -> TaaSbbT
-                int t1_attr = 0;
-                int t2_attr = t1_attr + 1 + (gen() % 4);
-
-                string t1_str = generate_T1(t1_attr, depth + 1);
-                string inner_s_str = generate_S(depth + 1);
-                string t2_str = generate_T2(t2_attr, depth + 1);
-
-                return t1_str + "aa" + inner_s_str + "bb" + t2_str;
-            }
+            return t1_str + "aa" + inner_s_str + "bb" + t2_str;
         }
     }
     return "";
 }
 
-string generate_T1(int attr_value, int depth)
+string generate_T1(int attr_value)
 {
     static mt19937 gen(random_device{}());
     
@@ -286,19 +258,19 @@ string generate_T1(int attr_value, int depth)
         uniform_int_distribution<> dis(0, 1);
         int choice = dis(gen);
         if (choice == 0)
-            return "ab" + generate_S(depth + 1); // T -> abS
+            return "ab" + generate_S(); // T -> abS
         else
             return "a"; // T -> a
     }
     else
-        return "a" + generate_T1(attr_value - 1, depth);
+        return "a" + generate_T1(attr_value - 1);
 }
-string generate_T2(int attr_value, int depth)
+string generate_T2(int attr_value)
 {
     static mt19937 gen(random_device{}());
     if (attr_value == 0)
         return "a";
-    return "a" + generate_T2(attr_value - 1, depth);
+    return "a" + generate_T2(attr_value - 1);
 }
 
 // Так красивее :)
@@ -335,7 +307,6 @@ bool fuzz(string& s, bool in_language)
     memo_T.clear();
     vector<int> result;
     int len = s.size();
-
     auto start_naive = high_resolution_clock::now();
     bool naive_res = check(naive_S(0, s, result), len);
     auto end_naive = high_resolution_clock::now();
@@ -374,29 +345,37 @@ bool fuzz(string& s, bool in_language)
 
 int main()
 {
-    //Не много тестов, чтобы не ждать долго результата
     string yes, no;
     bool y = true, n = true;
-    for (int i = 0; i < 50; i++)
+
+    //Чтобы тестировать разные строки, будем запоминать уже протестированные в этом векторе
+    vector <string> tests;
+
+    //100 тестов, чтобы не ждать долго результата
+    for (int i = 0; i < 100; i++)
     {
         yes = generate_random_string_from_language();
         bool in_language = 1;
-
+        
         //На словах длины больше 100 наивный парсер крепенько так обдумывает
-        if (yes.size() > 100)
+        if (yes.size() > 100 || find(tests.begin(), tests.end(), yes) != tests.end())
             continue;
+        tests.push_back(yes);
         if (!fuzz(yes, in_language))
         {
             y = false;
             break;
         }
     }
-
+    tests.clear();
+    
     //Здесь можно сделать намного больше тестов и работать будет быстро, но опять так красивее :)
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 100; i++)
     {
         no = generate_random_string();
         bool in_language = 0;
+        if (find(tests.begin(), tests.end(), yes) != tests.end())
+            continue;
         if (!fuzz(no, in_language))
         {
             n = false;
